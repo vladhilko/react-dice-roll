@@ -7,6 +7,19 @@
   /* Adjust if needed for a better 3D effect */
 }
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.cube+.button-container {
+  margin-top: 20px;
+  /* Adjust this value as needed to create space between the cube and the button */
+}
+
 .cube {
   position: relative;
   width: 200px;

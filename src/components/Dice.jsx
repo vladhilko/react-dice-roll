@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { motion } from 'framer-motion';
 import './Dice.css'; // Ensure CSS is correctly imported
 
@@ -16,22 +16,28 @@ const getRandomRotation = () => {
 const Dice = () => {
   const [rotation, setRotation] = useState({ x: 0, y: 0 }); // Start without triggering animation
   const [rollKey, setRollKey] = useState(0);
-  const [initialRoll, setInitialRoll] = useState(true); // Prevent roll on initial render
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === ' ' || event.code === 'Space') { // Check if space bar was pressed
+        event.preventDefault(); // Prevent the default action to avoid scrolling or other side effects
+        rollDice();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []); // Empty dependency array ensures this effect runs only once on mount
 
   const rollDice = () => {
-    if (!initialRoll) {
-      // Only apply if not the first roll
-      setRotation(getRandomRotation()); // Update rotation for new roll
-    } else {
-      // Enable rolling animation from now on
-      setInitialRoll(false);
-    }
+    setRotation(getRandomRotation()); // Update rotation for new roll
+
     setRollKey(prevKey => prevKey + 1); // Change key to re-trigger animation
   };
 
   const diceAnimation = {
     initial: { rotateX: 0, rotateY: 0 },
-    animate: initialRoll ? {} : { // Skip animation if initial roll
+    animate: {
       rotateX: rotation.x,
       rotateY: rotation.y,
       transition: { duration: 5, ease: [0.22, 0.68, 0.32, 0.98] }, // Smoother start and end
@@ -39,7 +45,7 @@ const Dice = () => {
   };
 
   return (
-    <div className="scene">
+    <div className="scene container">
       <motion.div
         key={rollKey}
         className="cube"
@@ -99,12 +105,17 @@ const Dice = () => {
           <div className="dot mr"></div> {/* Middle right */}
         </div>
       </motion.div>
-      <button
-        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={rollDice}
-      >
-        Roll Dice
-      </button>
+      <div className="button-container my-8">
+        <button
+          className="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mt-16"
+          onClick={rollDice}
+        >
+          Roll Dice
+        </button>
+      </div>
+      <div className="note w-screen text-center my-8">
+        Press the <strong>Space</strong> bar or click the button to roll the dice.
+      </div>
     </div>
   );
 };
